@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    width: 260px;
+    padding: 20px;
+    background: linear-gradient(160deg, #1c1c1e 0%, #2a2a2e 100%);
+    color: #e0e0e0;
+    min-height: 100px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: linear-gradient(135deg, #3a2a2a, #4a3030);
+    border-radius: 24px;
+    transition: all .35s ease;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .slider:before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;
+    top: 2px;
+    background: linear-gradient(135deg, #bbb, #e8e8e8);
+    border-radius: 50%;
+    transition: all .35s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+  input:checked + .slider { background: linear-gradient(135deg, #2a4035, #3a5a48); }
+  input:checked + .slider:before { transform: translateX(20px); }
+
+  .status-pill {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    transition: all .35s ease;
+  }
+  .status-pill.on  { background: rgba(80,160,100,0.15); color: #6abf80; border: 1px solid rgba(80,160,100,0.2); }
+  .status-pill.off { background: rgba(160,80,80,0.12);  color: #c07070; border: 1px solid rgba(160,80,80,0.18); }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .toggle-left { display: flex; flex-direction: column; gap: 4px; }
+  .toggle-label { font-size: 13px; font-weight: 500; color: #c8c8c8; }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    margin-bottom: 14px;
+  }
+
+  /* Collapsible section */
+  .collapsible {
+    overflow: hidden;
+    max-height: 300px;
+    transition: max-height .4s ease, opacity .3s ease, margin .3s ease;
+    opacity: 1;
+  }
+  .collapsible.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+  }
+
+  .box {
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+
+  .box-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  input[type=text] {
+    width: 100%;
+    padding: 8px 10px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #d0d0d0;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .2s;
+  }
+  input[type=text]:focus { border-color: rgba(255,255,255,0.2); }
+  input[type=text]::placeholder { color: #555; }
+
+  #cleanBtn {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #c0c0c0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  #cleanBtn:hover {
+    background: linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.07));
+    color: #e0e0e0;
+    border-color: rgba(255,255,255,0.16);
+  }
+
+  #result {
+    font-size: 11px;
+    color: #6abf80;
+    margin-top: 8px;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+
+  .info { font-size: 10px; color: #555; line-height: 1.6; letter-spacing: 0.02em; }
+
+  /* Collapse button */
+  #collapseBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 4px 0 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #444;
+    transition: color .2s;
+  }
+  #collapseBtn:hover { color: #777; }
+  #collapseBtn svg {
+    transition: transform .35s ease;
+  }
+  #collapseBtn.collapsed svg {
+    transform: rotate(180deg);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="title">Clipboard Cleaner</span>
+</div>
+
+<div class="toggle-row">
+  <div class="toggle-left">
+    <span class="toggle-label">Limpeza automática</span>
+    <span id="statusPill" class="status-pill">...</span>
+  </div>
+  <label class="switch">
+    <input type="checkbox" id="toggleSwitch">
+    <span class="slider"></span>
+  </label>
+</div>
+
+<div class="divider"></div>
+
+<div id="collapseSection" class="collapsible">
+  <div class="box">
+    <div class="box-label">Testar manualmente</div>
+    <input type="text" id="input" placeholder="Cole um texto para testar..." />
+    <button id="cleanBtn">Limpar e copiar</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="box">
+    <div class="info">
+      Remove &nbsp;\ &nbsp;/ &nbsp;: &nbsp;* &nbsp;? &nbsp;" &nbsp;&lt; &nbsp;&gt; &nbsp;|<br>
+      Limite de 255 caracteres
+    </div>
+  </div>
+</div>
+
+<button id="collapseBtn" title="Recolher">
+  <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+    <path d="M2 8L8 2L14 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<script src="popup.js"></script>
+</body>
+</html>
